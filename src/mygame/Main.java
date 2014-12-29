@@ -1,17 +1,15 @@
 package mygame;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
 import mygame.Models.Spider;
 import utils.Rotation;
 import utils.Translation;
+import utils.Dimensions;
+import mygame.Models.Floor;
 
 /**
  * test
@@ -23,23 +21,29 @@ public class Main extends SimpleApplication {
         Main app = new Main();
         app.start();
     }
-    Spatial p;
+    
+    Spatial spider1;
     @Override
     public void simpleInitApp() {
-        p = assetManager.loadModel("Models/spooder/blender2ogre-export.j3o");
-        //p.setLocalTranslation(0,0,8);
-        rootNode.attachChild(p);
+        spider1 = new Spider(assetManager, new Translation(0f, 0f, 10f), new Rotation(0, 0, 0.0f)).spider;
+        
+        Geometry floor = new Floor(assetManager, new Dimensions(30.0f, 1.0f, 30.0f)).getFloor();
+        
+        floor.setLocalTranslation(0, -20, 0);
+        
+        rootNode.attachChild(spider1);
+        rootNode.attachChild(floor);
     }
 
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
-        //p.rotate(0,0,1*tpf);
     }
 
     @Override
     public void simpleRender(RenderManager rm) {
         viewPort.setBackgroundColor(ColorRGBA.Blue);
+        
         //TODO: add render code
     }
 }
