@@ -10,6 +10,7 @@ import utils.Rotation;
 import utils.Translation;
 import utils.Dimensions;
 import mygame.Models.Floor;
+import mygame.Models.Wall;
 
 /**
  * test
@@ -28,11 +29,12 @@ public class Main extends SimpleApplication {
         spider1 = new Spider(assetManager, new Translation(0f, 0f, 10f), new Rotation(0, 0, 0.0f)).spider;
         
         Geometry floor = new Floor(assetManager, new Dimensions(30.0f, 1.0f, 30.0f)).getFloor();
-        
+        Wall wall = new Wall(assetManager, new Dimensions(1,20,30));
         floor.setLocalTranslation(0, -20, 0);
         
         rootNode.attachChild(spider1);
         rootNode.attachChild(floor);
+        rootNode.attachChild(wall.getWall());
     }
 
     @Override
