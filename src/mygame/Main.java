@@ -29,12 +29,26 @@ public class Main extends SimpleApplication {
         spider1 = new Spider(assetManager, new Translation(0f, 0f, 10f), new Rotation(0, 0, 0.0f)).spider;
         
         Geometry floor = new Floor(assetManager, new Dimensions(30.0f, 1.0f, 30.0f)).getFloor();
-        Wall wall = new Wall(assetManager, new Dimensions(1,20,30));
-        floor.setLocalTranslation(0, -20, 0);
+        Wall wallRight = new Wall(assetManager, new Dimensions(1,20,30));
+        Wall wallLeft = new Wall(assetManager, new Dimensions(1,20,30));
+        Wall wallFront = new Wall(assetManager, new Dimensions(30,20,1));
+        Wall wallBack = new Wall(assetManager, new Dimensions(30,20,1));
+        Spatial batman = assetManager.loadModel("Models/IronMan/IronMan.j3o");
         
+        floor.setLocalTranslation(0, -20, 0);
+        wallRight.getWall().setLocalTranslation(30, 0, 0);
+        wallLeft.getWall().setLocalTranslation(-30, 0, 0);
+        wallFront.getWall().setLocalTranslation(0, 0, -30);
+        wallBack.getWall().setLocalTranslation(0, 0, 30);
         rootNode.attachChild(spider1);
         rootNode.attachChild(floor);
-        rootNode.attachChild(wall.getWall());
+        rootNode.attachChild(wallRight.getWall());
+        rootNode.attachChild(wallLeft.getWall());
+        rootNode.attachChild(wallFront.getWall());
+        rootNode.attachChild(wallBack.getWall());
+        rootNode.attachChild(batman);
+        //batman.scale(0.5f);
+        batman.setLocalTranslation(0,0,-5);
     }
 
     @Override
