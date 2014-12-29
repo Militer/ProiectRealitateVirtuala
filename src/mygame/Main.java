@@ -23,16 +23,18 @@ public class Main extends SimpleApplication {
         Main app = new Main();
         app.start();
     }
-
+    Spatial p;
     @Override
     public void simpleInitApp() {
-        Spatial model = new Spider(assetManager, new Translation(0f, 0f, 10f), new Rotation(0, 0, 0.5f)).spider;
-        rootNode.attachChild(model);
+        p = assetManager.loadModel("Models/spooder/blender2ogre-export.j3o");
+        //p.setLocalTranslation(0,0,8);
+        rootNode.attachChild(p);
     }
 
     @Override
     public void simpleUpdate(float tpf) {
         //TODO: add update code
+        //p.rotate(0,0,1*tpf);
     }
 
     @Override
