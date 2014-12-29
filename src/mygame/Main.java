@@ -23,7 +23,7 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         Spatial model = assetManager.loadModel("Models/Spider/blender2ogre-export.j3o");
-
+        //cred ca ii ok
         rootNode.attachChild(model);
     }
 
