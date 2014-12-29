@@ -12,10 +12,14 @@ import utils.Rotation;
 import utils.Translation;
 
 public class Spider{
-    public Spatial spider;
+    private Spatial spider;
     public Spider(AssetManager assetManager, Translation t, Rotation r){
         spider = assetManager.loadModel("Models/spooder/blender2ogre-export.j3o");
-        //spider.rotate(r.getxAngle(), r.getyAngle(), r.getzAngle());
-        //spider.setLocalTranslation(t.getX(), t.getY(), t.getZ());
+        spider.rotate(r.getxAngle(), r.getyAngle(), r.getzAngle());
+        spider.setLocalTranslation(t.getX(), t.getY(), t.getZ());
+    }
+
+    public Spatial getSpider() {
+        return spider;
     }
 }
