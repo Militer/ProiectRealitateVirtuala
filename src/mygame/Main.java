@@ -42,96 +42,111 @@ public class Main extends SimpleApplication implements  AnalogListener{
     Vector3f camDir = new Vector3f();
     Vector3f camLeft = new Vector3f();
     CameraNode camNode;
-    
+    Node characterNode = new Node();
+    Node neckNode = new Node();
+        
     IronMan character;
     Spider spider1;
     Room room;
             
     @Override
     public void simpleInitApp() {       
-        character = new IronMan(assetManager, new Translation(0f, -1.5f, 0f), new Rotation(0, 3.2f, 0));
+        character = new IronMan(assetManager, new Translation(0, -1.5f, 0f), new Rotation(0, 0, 0));
         spider1 = new Spider(assetManager, new Translation(0f, 0f, -0.5f), new Rotation(0, 0, 0));
-        room = new Room(assetManager);
+        room = new Room(assetManager, new Vector3f(0, 0 ,0), 10, 10);
         
-        flyCam.setEnabled(false);
-        //flyCam.setMoveSpeed(5);
+        //characterNode.attachChild(character.getCharacter());
         camNode = new CameraNode("Camera Node", cam);
-        camNode.setControlDir(ControlDirection.CameraToSpatial);
         camNode.setControlDir(ControlDirection.SpatialToCamera);
         //Attach the camNode to the target:
-        camNode.attachChild(character.getCharacter());
-        camNode.setLocalTranslation(character.getPosition());
-        //chaseCam = new ChaseCamera(cam, character.getCharacter(), inputManager);
-        //chaseCam.setSmoothMotion(true);
+        characterNode.attachChild(character.getCharacter());
+        characterNode.attachChild(neckNode);
+        neckNode.attachChild(camNode);
+        neckNode.setLocalTranslation(character.getPosition());
+        
+        flyCam.setEnabled(true);
+        inputManager.setCursorVisible(true);
         
         rootNode.attachChild(character.getCharacter());
+        rootNode.attachChild(characterNode);
         rootNode.attachChild(spider1.getSpider());
         rootNode.attachChild(room.getRoom());
         
-        //rootNode.setLocalTranslation(0, -1, 2.5f);
+        neckNode.move(0, 6.5f, 0);
+        camNode.move(0, 0.8f, 0);
+        
         registerInput();
 
   }
 
   public void registerInput() {
-    inputManager.addMapping("rotateX", new MouseAxisTrigger(MouseInput.AXIS_X, true));
-    inputManager.addMapping("rotateXReverse", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+    inputManager.addMapping("rotateLeft", new MouseAxisTrigger(MouseInput.AXIS_X, true));
+    inputManager.addMapping("rotateRight", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+    inputManager.addMapping("rotateUp", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+    inputManager.addMapping("rotateDown", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
     inputManager.addMapping("moveForward", new KeyTrigger(keyInput.KEY_UP), new KeyTrigger(keyInput.KEY_W));
     inputManager.addMapping("moveBackward", new KeyTrigger(keyInput.KEY_DOWN), new KeyTrigger(keyInput.KEY_S));
     inputManager.addMapping("moveRight", new KeyTrigger(keyInput.KEY_RIGHT), new KeyTrigger(keyInput.KEY_D));
     inputManager.addMapping("moveLeft", new KeyTrigger(keyInput.KEY_LEFT), new KeyTrigger(keyInput.KEY_A));
     inputManager.addMapping("displayPosition", new KeyTrigger(keyInput.KEY_P));
-    inputManager.addListener(this, "moveForward", "moveBackward", "moveRight", "moveLeft", "rotateX", "rotateXReverse");
+    inputManager.addListener(this, "moveForward", "moveBackward", "moveRight", "moveLeft", "rotateLeft", "rotateRight", "rotateUp", "rotateDown");
     inputManager.addListener(this, "displayPosition");
   }
 
     Quaternion q = new Quaternion();
+    float rotUp = 0;
+    static final float movementSpeed = 2, rotationSpeed = 5;
 
     public void onAnalog(String name, float value, float tpf) {
+        Vector3f direction = new Vector3f();
+        float xCam = direction.set(cam.getDirection()).x, zCam = direction.set(cam.getDirection()).z;
+        float r = (float) (movementSpeed / Math.sqrt((xCam * xCam) + (zCam * zCam)));
+        xCam *= r;
+        zCam *= r;
+        cam.getDirection().normalize();
         if (name.equals("moveForward")) {
-            character.move(cam.getDirection().x * 3 * value, 0, cam.getDirection().z * 3 *  value);
-        }        
+          direction.set(xCam * 3 * value, 0, zCam * 3 *  value);
+          characterNode.move(direction);
+          character.getCharacter().move(direction);
+        }
         if (name.equals("moveBackward")) {
-            character.move(cam.getDirection().x * -3 * value, 0, cam.getDirection().z * -3 *  value);
+          direction.set(-xCam * 3 * value, 0, -zCam * 3 *  value);
+          characterNode.move(direction);
+          character.getCharacter().move(direction);
         }
         if (name.equals("moveRight")) {
-            character.move(cam.getDirection().z * -3 * value, 0, cam.getDirection().x * 3 *  value);
+          direction.set(-zCam * 3 *  value, 0, xCam * 3 * value);
+          characterNode.move(direction);
+          character.getCharacter().move(direction);
         }
         if (name.equals("moveLeft")) {
-            character.move(cam.getDirection().z * 3 * value, 0, cam.getDirection().x * -3 *  value);
-         }
-         cam.setLocation(character.getPosition());
-        if(name.equals("rotateX")){
-            character.rotate(0, value * 1, 0);
-            camNode.rotate(0f, value * 1, 0f);
+          direction.set(zCam * 3 *  value, 0, -xCam * 3 * value);
+          characterNode.move(direction);
+          character.getCharacter().move(direction);
         }
-        if(name.equals("rotateXReverse")){
-            character.rotate(0, -value * 1, 0);
-            camNode.rotate(0f, value * 1, 0f);
+        
+        if (name.equals("rotateLeft")) {
+          characterNode.rotate(0, rotationSpeed * tpf, 0);
+          character.getCharacter().rotate(0, rotationSpeed * tpf, 0);
+        }
+        if (name.equals("rotateRight")) {
+          characterNode.rotate(0, -rotationSpeed * tpf, 0);
+          character.getCharacter().rotate(0, -rotationSpeed * tpf, 0);
+        }
+        if (name.equals("rotateUp") && rotUp < 1.3f) {
+          neckNode.rotate(rotationSpeed * tpf, 0, 0);
+          rotUp += rotationSpeed * tpf;
+        }
+        if (name.equals("rotateDown") && rotUp > -1.5f) {
+            neckNode.rotate(-rotationSpeed * tpf, 0, 0);
+            rotUp -= rotationSpeed * tpf;
         }
     }
     
 
     @Override
     public void simpleUpdate(float tpf) {
-    /*camDir.set(cam.getDirection()).multLocal(0.6f);
-    camLeft.set(cam.getLeft()).multLocal(0.4f);
-        walkDirection.set(0, 0, 0);
-        if (left) {
-            walkDirection.addLocal(camLeft);
-        }
-        if (right) {
-            walkDirection.addLocal(camLeft.negate());
-        }
-        if (forward) {
-            walkDirection.addLocal(camDir);
-        }
-        if (backward) {
-            walkDirection.addLocal(camDir.negate());
-        }
-        //character.getCharacter().setWalkDirection(walkDirection);
-        cam.setLocation(character.getPosition());
-    */}
+    }
 
     @Override
     public void simpleRender(RenderManager rm) {
