@@ -18,13 +18,14 @@ import utils.Dimensions;
 public class Wall {
     private Box _wall;
     private Geometry _wallG;
+    
     public Wall(AssetManager assetManager, Dimensions d) {
         _wall = new Box(d.getX(), d.getY(), d.getZ());
         _wallG = new Geometry("WalG",_wall);
         Material wallMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         Texture wallTex = assetManager.loadTexture("Textures/wall.jpg");
         wallMat.setTexture("ColorMap", wallTex);
-        _wallG.setMaterial(wallMat);
+        _wallG.setMaterial(wallMat);        
     }
     public Geometry getWall() {
         return _wallG;
