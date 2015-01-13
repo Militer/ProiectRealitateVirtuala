@@ -5,6 +5,7 @@
 package mygame.Models;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.bullet.BulletAppState;
 import com.jme3.scene.Node;
 import utils.Dimensions;
 
@@ -45,6 +46,15 @@ public class Hallway {
         hallway.attachChild(above.getFloor());
         hallway.attachChild(front.getWall());
     }
+    
+    public void addPhysicsSpace(BulletAppState bulletAppState) {
+       bulletAppState.getPhysicsSpace().add(front.addControl());
+       bulletAppState.getPhysicsSpace().add(above.addControl());
+       bulletAppState.getPhysicsSpace().add(back.addControl());
+       bulletAppState.getPhysicsSpace().add(right.addControl());
+       bulletAppState.getPhysicsSpace().add(floor.addControl());
+    }  
+        
     public Node getHallway() {
         return hallway;
     }

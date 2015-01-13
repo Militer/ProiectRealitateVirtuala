@@ -37,8 +37,4 @@ public class IronMan {
     public Vector3f getDirection() {
         return direction;
     }
-
-    public CharacterControl getCharacterControl() {
-        return characterControl;
-    }
 }

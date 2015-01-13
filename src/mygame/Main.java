@@ -126,6 +126,10 @@ public class Main extends SimpleApplication implements ActionListener, AnalogLis
         //character.getCharacter().addControl(player);
         
         room.addPhysicsSpace(bulletAppState);
+        room2.addPhysicsSpace(bulletAppState);
+        room3.addPhysicsSpace(bulletAppState);
+        hw.addPhysicsSpace(bulletAppState);
+        
         
         registerInput();
 
@@ -226,7 +230,7 @@ public class Main extends SimpleApplication implements ActionListener, AnalogLis
          if(forward || backward || left || right) {
             //Vector3f x= direction.mult(600 * tpf);
             //System.out.println(x.x + "- " + x.y + " - " + x.z);
-            player.setWalkDirection(walkDirection.mult(2000 * tpf));
+            player.setWalkDirection(walkDirection.mult(200 * tpf));
             //bodyNode.move(direction);
             //character.getCharacter().move(direction);
        
