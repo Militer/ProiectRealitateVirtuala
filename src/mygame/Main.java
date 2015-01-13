@@ -156,7 +156,7 @@ public class Main extends SimpleApplication implements ActionListener, AnalogLis
     boolean forward = false, backward = false, right = false, left = false, jump = false;
     Vector3f direction = new Vector3f();
     
-    static final float movementSpeed = 5f, rotationSpeed = 5;
+    static final float movementSpeed = 5f, rotationSpeed = 2;
     
     @Override
     public void onAnalog(String name, float value, float tpf){
@@ -199,29 +199,29 @@ public class Main extends SimpleApplication implements ActionListener, AnalogLis
 
     @Override
     public void simpleUpdate(float tpf) {
-        /*float xCam = direction.set(cam.getDirection()).x, zCam = direction.set(cam.getDirection()).z;
+        float xCam = direction.set(cam.getDirection()).x, zCam = direction.set(cam.getDirection()).z;
         float r = (float) (movementSpeed / Math.sqrt((xCam * xCam) + (zCam * zCam)));
         xCam *= r;
-        zCam *= r;*/
-        Vector3f camDir = cam.getDirection().clone();
+        zCam *= r;
+        /*Vector3f camDir = cam.getDirection().clone();
         Vector3f camLeft = cam.getLeft().clone();
         camDir.y = 0;
         camLeft.y = 0;
-        //camDir.normalizeLocal();
-        //camLeft.normalizeLocal();
+        camDir.normalizeLocal();
+        camLeft.normalizeLocal();*/
         walkDirection.set(0, 0, 0);
         
         if(forward == true){
-           walkDirection.addLocal(camDir);
+           walkDirection.addLocal(xCam, 0, zCam);
         }
         if(backward == true){
-           walkDirection.addLocal(camDir.negate());
+           walkDirection.addLocal(-xCam, 0, -zCam);
         }
         if(right == true){
-            walkDirection.addLocal(camLeft.negate());
+            walkDirection.addLocal(-zCam , 0, xCam);
         }
         if(left == true){
-           walkDirection.addLocal(camLeft);
+            walkDirection.addLocal(+zCam , 0, -xCam);
         }
         if(jump == true){
            player.jump();

@@ -20,12 +20,13 @@ public class Room {
     //private List<Vector3f> boundingBoxes = new ArrayList<Vector3f>(); 
     Wall wallRight, wallFront, wallBack, wallLeftUpper, wallLeftLower1, wallLeftLower2;
     Floor floor, ceiling;
+    Spatial aq;
     
     public Room(AssetManager assetManager, Vector3f center, float length, float width){
         floor = new Floor(assetManager, new Dimensions(length, 1, width), true);
         ceiling = new Floor(assetManager, new Dimensions(length, 1, width), false);
         
-        Spatial aq = assetManager.loadModel("Models/Aquarium/Aquarium.j3o");
+        aq = assetManager.loadModel("Models/Aquarium/Aquarium.j3o");
         aq.setLocalTranslation(0, 0, 3);
         
         Spider tarantula = new Spider(assetManager, new Translation(0,2,3), new Rotation(0,0,5));
@@ -73,5 +74,9 @@ public class Room {
        bulletAppState.getPhysicsSpace().add(wallBack.addControl());
        bulletAppState.getPhysicsSpace().add(floor.addControl());
        bulletAppState.getPhysicsSpace().add(ceiling.addControl());
+       RigidBodyControl rbc = new RigidBodyControl(0);
+       aq.addControl(rbc);
+       bulletAppState.getPhysicsSpace().add(aq);
+       
     }   
 }
