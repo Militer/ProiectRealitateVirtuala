@@ -12,11 +12,15 @@ public class Floor {
 
     private Geometry floor;
     
-    public Floor(AssetManager assetManager, Dimensions dimension){
+    public Floor(AssetManager assetManager, Dimensions dimension, boolean floorB){
         Box floorBox = new Box(dimension.getX(), dimension.getY(), dimension.getZ());
         Geometry geom = new Geometry("floor", floorBox);        
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setTexture("ColorMap", assetManager.loadTexture("Textures/floor.jpg"));
+        if(floorB == true)
+            mat.setTexture("ColorMap", assetManager.loadTexture("Textures/floor.jpg"));
+        else {
+            mat.setTexture("ColorMap", assetManager.loadTexture("Textures/wall.jpg"));
+        }
         geom.setMaterial(mat);
         floor = geom;
     }

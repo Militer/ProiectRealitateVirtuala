@@ -8,6 +8,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
+import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
@@ -23,6 +24,7 @@ import utils.Rotation;
 import utils.Translation;
 import utils.Dimensions;
 import mygame.Models.Floor;
+import mygame.Models.Hallway;
 import mygame.Models.IronMan;
 import mygame.Models.Room;
 import mygame.Models.Wall;
@@ -48,12 +50,23 @@ public class Main extends SimpleApplication implements  AnalogListener{
     IronMan character;
     Spider spider1;
     Room room;
+    Room room2;
+    Room room3;
             
     @Override
     public void simpleInitApp() {       
         character = new IronMan(assetManager, new Translation(0, -1.5f, 0f), new Rotation(0, 0, 0));
-        spider1 = new Spider(assetManager, new Translation(0f, 0f, -0.5f), new Rotation(0, 0, 0));
+        //spider1 = new Spider(assetManager, new Translation(0f, 2f, 0), new Rotation(0, 0, 5));
         room = new Room(assetManager, new Vector3f(0, 0 ,0), 10, 10);
+        room.getRoom().setLocalTranslation(15, 0, 10);
+        
+        room2 = new Room(assetManager, new Vector3f(0, 0 ,0), 10, 10);
+        room2.getRoom().setLocalTranslation(15, 0, 30);
+        
+        room3 = new Room(assetManager, new Vector3f(0, 0 ,0), 10, 10);
+        room3.getRoom().setLocalTranslation(15, 0, 50);
+        
+        Hallway hw = new Hallway(assetManager);
         
         //characterNode.attachChild(character.getCharacter());
         camNode = new CameraNode("Camera Node", cam);
@@ -69,11 +82,14 @@ public class Main extends SimpleApplication implements  AnalogListener{
         
         rootNode.attachChild(character.getCharacter());
         rootNode.attachChild(characterNode);
-        rootNode.attachChild(spider1.getSpider());
+        //rootNode.attachChild(spider1.getSpider());
         rootNode.attachChild(room.getRoom());
-        
+        rootNode.attachChild(room2.getRoom());
+        rootNode.attachChild(room3.getRoom());
+        //rootNode.attachChild(spider1.getSpider());
         neckNode.move(0, 6.5f, 0);
         camNode.move(0, 0.8f, 0);
+        rootNode.attachChild(hw.getHallway());
         
         registerInput();
 
