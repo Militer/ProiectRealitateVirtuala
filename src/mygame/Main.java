@@ -1,6 +1,10 @@
 package mygame;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.bounding.BoundingBox;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
+import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.CharacterControl;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.MouseInput;
@@ -18,6 +22,8 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.CameraControl.ControlDirection;
+import java.util.ArrayList;
+import java.util.List;
 import mygame.Models.Spider;
 import utils.Rotation;
 import utils.Translation;
@@ -31,49 +37,80 @@ import mygame.Models.Wall;
  * test
  * @author normenhansen
  */
-public class Main extends SimpleApplication implements  AnalogListener{
+public class Main extends SimpleApplication implements ActionListener, AnalogListener {
 
     public static void main(String[] args) {
         Main app = new Main();
         app.start();
     }
     
+    List<Vector3f> boundingBoxes = new ArrayList<Vector3f>();
+            
     Vector3f walkDirection = new Vector3f();
     Vector3f camDir = new Vector3f();
     Vector3f camLeft = new Vector3f();
     CameraNode camNode;
     Node characterNode = new Node();
+    Node bodyNode = new Node();
     Node neckNode = new Node();
         
     IronMan character;
     Spider spider1;
     Room room;
             
+    private BetterCharacterControl player;
+    private BulletAppState bulletAppState;
+  
+  
     @Override
-    public void simpleInitApp() {       
+    public void simpleInitApp() { 
+        bulletAppState = new BulletAppState();
+        stateManager.attach(bulletAppState);
+    
+    
         character = new IronMan(assetManager, new Translation(0, -1.5f, 0f), new Rotation(0, 0, 0));
         spider1 = new Spider(assetManager, new Translation(0f, 0f, -0.5f), new Rotation(0, 0, 0));
         room = new Room(assetManager, new Vector3f(0, 0 ,0), 10, 10);
+        //boundingBoxes.addAll(room.getBoundingVectors());
         
-        //characterNode.attachChild(character.getCharacter());
         camNode = new CameraNode("Camera Node", cam);
         camNode.setControlDir(ControlDirection.SpatialToCamera);
+        
+        player = new BetterCharacterControl(1.5f, 4f, 1f);
+        //player.warp(character.getPosition());
+        player.setGravity(new Vector3f(0, 1, 0));
+        player.setJumpForce(new Vector3f(0, 2, 0));
+        
         //Attach the camNode to the target:
-        characterNode.attachChild(character.getCharacter());
-        characterNode.attachChild(neckNode);
         neckNode.attachChild(camNode);
         neckNode.setLocalTranslation(character.getPosition());
         
+        bodyNode.attachChild(character.getCharacter());
+        bodyNode.attachChild(neckNode);
+        
+        characterNode.attachChild(bodyNode);
+        
         flyCam.setEnabled(true);
         inputManager.setCursorVisible(true);
+        //flyCam.setEnabled(false);
         
-        rootNode.attachChild(character.getCharacter());
+        
+        bulletAppState.getPhysicsSpace().add(player);
+        bulletAppState.getPhysicsSpace().addAll(characterNode);        
+        
+        //rootNode.attachChild(character.getCharacter());
         rootNode.attachChild(characterNode);
         rootNode.attachChild(spider1.getSpider());
         rootNode.attachChild(room.getRoom());
         
         neckNode.move(0, 6.5f, 0);
         camNode.move(0, 0.8f, 0);
+        
+        //camNode.addControl(player);
+        characterNode.addControl(player);
+        //character.getCharacter().addControl(player);
+        
+        room.addPhysicsSpace(bulletAppState);
         
         registerInput();
 
@@ -88,50 +125,27 @@ public class Main extends SimpleApplication implements  AnalogListener{
     inputManager.addMapping("moveBackward", new KeyTrigger(keyInput.KEY_DOWN), new KeyTrigger(keyInput.KEY_S));
     inputManager.addMapping("moveRight", new KeyTrigger(keyInput.KEY_RIGHT), new KeyTrigger(keyInput.KEY_D));
     inputManager.addMapping("moveLeft", new KeyTrigger(keyInput.KEY_LEFT), new KeyTrigger(keyInput.KEY_A));
+    inputManager.addMapping("jump", new KeyTrigger(keyInput.KEY_SPACE));
+    
+    
     inputManager.addMapping("displayPosition", new KeyTrigger(keyInput.KEY_P));
-    inputManager.addListener(this, "moveForward", "moveBackward", "moveRight", "moveLeft", "rotateLeft", "rotateRight", "rotateUp", "rotateDown");
+    inputManager.addListener(this, "moveForward", "moveBackward", "moveRight", "moveLeft", "rotateLeft", "rotateRight", "rotateUp", "rotateDown", "jump");
     inputManager.addListener(this, "displayPosition");
   }
 
-    Quaternion q = new Quaternion();
     float rotUp = 0;
-    static final float movementSpeed = 2, rotationSpeed = 5;
-
-    public void onAnalog(String name, float value, float tpf) {
-        Vector3f direction = new Vector3f();
-        float xCam = direction.set(cam.getDirection()).x, zCam = direction.set(cam.getDirection()).z;
-        float r = (float) (movementSpeed / Math.sqrt((xCam * xCam) + (zCam * zCam)));
-        xCam *= r;
-        zCam *= r;
-        cam.getDirection().normalize();
-        if (name.equals("moveForward")) {
-          direction.set(xCam * 3 * value, 0, zCam * 3 *  value);
-          characterNode.move(direction);
-          character.getCharacter().move(direction);
-        }
-        if (name.equals("moveBackward")) {
-          direction.set(-xCam * 3 * value, 0, -zCam * 3 *  value);
-          characterNode.move(direction);
-          character.getCharacter().move(direction);
-        }
-        if (name.equals("moveRight")) {
-          direction.set(-zCam * 3 *  value, 0, xCam * 3 * value);
-          characterNode.move(direction);
-          character.getCharacter().move(direction);
-        }
-        if (name.equals("moveLeft")) {
-          direction.set(zCam * 3 *  value, 0, -xCam * 3 * value);
-          characterNode.move(direction);
-          character.getCharacter().move(direction);
-        }
-        
-        if (name.equals("rotateLeft")) {
-          characterNode.rotate(0, rotationSpeed * tpf, 0);
-          character.getCharacter().rotate(0, rotationSpeed * tpf, 0);
+    boolean forward = false, backward = false, right = false, left = false, jump = false;
+    Vector3f direction = new Vector3f();
+    
+    static final float movementSpeed = 5f, rotationSpeed = 5;
+    
+    @Override
+    public void onAnalog(String name, float value, float tpf){
+         if (name.equals("rotateLeft")) {
+          bodyNode.rotate(0, rotationSpeed * tpf, 0);
         }
         if (name.equals("rotateRight")) {
-          characterNode.rotate(0, -rotationSpeed * tpf, 0);
-          character.getCharacter().rotate(0, -rotationSpeed * tpf, 0);
+          bodyNode.rotate(0, -rotationSpeed * tpf, 0);
         }
         if (name.equals("rotateUp") && rotUp < 1.3f) {
           neckNode.rotate(rotationSpeed * tpf, 0, 0);
@@ -140,12 +154,71 @@ public class Main extends SimpleApplication implements  AnalogListener{
         if (name.equals("rotateDown") && rotUp > -1.5f) {
             neckNode.rotate(-rotationSpeed * tpf, 0, 0);
             rotUp -= rotationSpeed * tpf;
+        }    
+    }
+    
+    
+    @Override
+    public void onAction(String name, boolean keyIsPressed, float tpf) {       
+        if (name.equals("moveForward")) {
+          forward = keyIsPressed;
         }
+        if (name.equals("moveBackward")) {
+          backward = keyIsPressed;
+        }
+        if (name.equals("moveRight")) {
+          right = keyIsPressed;
+        }
+        if (name.equals("moveLeft")) {
+          left = keyIsPressed;
+        }   
+        if (name.equals("jump")) {
+          jump = keyIsPressed;
+        } 
     }
     
 
     @Override
     public void simpleUpdate(float tpf) {
+        /*float xCam = direction.set(cam.getDirection()).x, zCam = direction.set(cam.getDirection()).z;
+        float r = (float) (movementSpeed / Math.sqrt((xCam * xCam) + (zCam * zCam)));
+        xCam *= r;
+        zCam *= r;*/
+        Vector3f camDir = cam.getDirection().clone();
+        Vector3f camLeft = cam.getLeft().clone();
+        camDir.y = 0;
+        camLeft.y = 0;
+        //camDir.normalizeLocal();
+        //camLeft.normalizeLocal();
+        walkDirection.set(0, 0, 0);
+        
+        if(forward == true){
+           walkDirection.addLocal(camDir);
+        }
+        if(backward == true){
+           walkDirection.addLocal(camDir.negate());
+        }
+        if(right == true){
+            walkDirection.addLocal(camLeft.negate());
+        }
+        if(left == true){
+           walkDirection.addLocal(camLeft);
+        }
+        if(jump == true){
+           player.jump();
+        }
+        
+         if(forward || backward || left || right) {
+            //Vector3f x= direction.mult(600 * tpf);
+            //System.out.println(x.x + "- " + x.y + " - " + x.z);
+            player.setWalkDirection(walkDirection.mult(2000 * tpf));
+            //bodyNode.move(direction);
+            //character.getCharacter().move(direction);
+       
+        }
+         else {
+             player.setWalkDirection(Vector3f.ZERO);
+         }      
     }
 
     @Override

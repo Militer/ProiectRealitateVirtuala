@@ -5,6 +5,8 @@
 package mygame.Models;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.bounding.BoundingBox;
+import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 
@@ -29,5 +31,11 @@ public class Wall {
     }
     public Geometry getWall() {
         return _wallG;
+    }
+    
+    public RigidBodyControl addControl(){
+        RigidBodyControl rbc = new RigidBodyControl(0);
+        _wallG.addControl(rbc);
+        return rbc;
     }
 }

@@ -1,6 +1,8 @@
 package mygame.Models;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
+import com.jme3.bullet.control.CharacterControl;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 import utils.Rotation;
@@ -16,7 +18,7 @@ public class IronMan {
         character.rotate(r.getxAngle(), r.getyAngle(), r.getzAngle());
         character.setLocalTranslation(t.getX(), t.getY(), t.getZ());
         position = new Vector3f(t.getX(), t.getY(), t.getZ()  - 0.5f);
-        direction = new Vector3f(0, 0, 0);
+        direction = new Vector3f(0, 0, 0);        
     }
 
     public Spatial getCharacter() {
@@ -34,5 +36,9 @@ public class IronMan {
     
     public Vector3f getDirection() {
         return direction;
+    }
+
+    public CharacterControl getCharacterControl() {
+        return characterControl;
     }
 }
